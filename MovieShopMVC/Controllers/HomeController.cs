@@ -23,6 +23,7 @@ namespace MovieShopMVC.Controllers
             //1.Strong typed models
             //2.View Bag
             //3.View Data
+            //C#
 
             ViewBag.PageTitle = "Top Revenue Movies";
             ViewData["TotalMovies"] = movies.Count();
