@@ -17,25 +17,25 @@ namespace Infrastructure.Data
 
         }
 
-//		Code First Approach
-//	Install the required packages
+//Code First Approach
+//Install the required packages
 
-//	Creating the database using EF core code first approach, we use something called Migrations(set of commands that we run to create the database)
+//Creating the database using EF core code first approach, we use something called Migrations(set of commands that we run to create the database)
 	
-//	2 ways we can implement migrations
-//		1.Universal Way => everyone Windows/Mac/Linux => dotnet cli
-//		2.Windows and Visual Studio => Package Manager Console => here we can run our Migration commands
-//		Create a connection string in your startup(MVC) project
+//2 ways we can implement migrations
+//	1.Universal Way => everyone Windows/Mac/Linux => dotnet cli
+//	2.Windows and Visual Studio => Package Manager Console => here we can run our Migration commands
+//	Create a connection string in your startup(MVC) project
 
 //2 most important classes
 
 //1. DbContext => Represents your Database
 //2. DbSet => Your Tables
 
-//Create a class that inherites from DbContext
+// Create a class that inherites from DbContext
 // DbSets represents your tables
 // Create the DbSets Properties inside DBContext
-// Inject the COnnectionString from the Startup file (read the connection string from appsetting.json) to DbContext using DbContextOptions
+// Inject the ConnectionString from the Startup file (read the connection string from appsetting.json) to DbContext using DbContextOptions
 // Migrations, run migrations against the DbContext Class which is located in Infrastructure
 // COmmands that we are gonna tell Entity Framework to read our DbCOntext, DbSets, enttiies ,properties..
 // Make sure Migrations are named in a meaningful way, think of them as SQL Scripts
@@ -48,6 +48,7 @@ namespace Infrastructure.Data
         public DbSet<Movie> Movies { get; set; }
         public DbSet<Trailer> Trailers { get; set; }
         public DbSet<Cast> Casts { get; set; }
+        public DbSet<Crew> Crew { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -60,7 +61,98 @@ namespace Infrastructure.Data
             modelBuilder.Entity<Trailer>(ConfigureTrailer);
             modelBuilder.Entity<Cast>(ConfigureCast);
             modelBuilder.Entity<MovieCast>(ConfigureMovieCast);
+            modelBuilder.Entity<Crew>(ConfigureCrew);
+            modelBuilder.Entity<MovieCrew>(ConfigureMovieCrew);
+            modelBuilder.Entity<User>(ConfigureUser);
+            modelBuilder.Entity<Review>(ConfigureReview);
+            modelBuilder.Entity<Favorite>(ConfigureFavorite);
+            modelBuilder.Entity<Purchase>(ConfigurePurchase);
+            modelBuilder.Entity<Role>(ConfigureRole);
+            modelBuilder.Entity<UserRole>(ConfigureUserRole);
         }
+
+        private void ConfigureUserRole(EntityTypeBuilder<UserRole> builder)
+        {
+            builder.ToTable("UserRole");
+            builder.HasKey(ur => new { ur.UserId, ur.RoleId });
+            builder.HasOne(ur => ur.User).WithMany(ur => ur.UserRoles).HasForeignKey(ur => ur.UserId);
+            builder.HasOne(ur => ur.User).WithMany(ur => ur.UserRoles).HasForeignKey(ur => ur.UserId);
+        }
+        private void ConfigureRole(EntityTypeBuilder<Role> builder)
+        {
+            builder.ToTable("Role");
+            builder.HasKey(ro => new { ro.Id });
+            builder.Property(ro => ro.Name).HasMaxLength(20);
+        }
+
+            private void ConfigurePurchase(EntityTypeBuilder<Purchase> builder)
+        {
+            builder.ToTable("Purchase");
+            builder.HasKey(p => new { p.Id });
+            builder.Property(p => p.UserId);
+            builder.Property(p => p.PurchaseNumber);
+            builder.Property(p => p.TotalPrice).HasColumnType("decimal(18,2)");
+            builder.Property(p => p.PurchaseDateTime).HasDefaultValueSql("getdate()");
+            builder.Property(p => p.MovieId);
+            builder.HasOne(p => p.Movie).WithMany(p => p.Purchases).HasForeignKey(p => p.MovieId);
+            builder.HasOne(p => p.User).WithMany(p => p.Purchases).HasForeignKey(p => p.UserId);
+        }
+
+        private void ConfigureFavorite(EntityTypeBuilder<Favorite> builder)
+        {
+            builder.ToTable("Favorite");
+            builder.HasKey(f => new { f.Id});
+            builder.Property(f => f.MovieId);
+            builder.Property(f => f.UserId);
+            builder.HasOne(f => f.Movie).WithMany(f => f.Favorites).HasForeignKey(f => f.MovieId);
+            builder.HasOne(f => f.User).WithMany(f => f.Favorites).HasForeignKey(f => f.UserId);
+        }
+        private void ConfigureReview(EntityTypeBuilder<Review> builder)
+        {
+            builder.ToTable("Review");
+            builder.HasKey(r => new { r.MovieId, r.UserId});
+            builder.Property(r => r.Rating).HasColumnType("decimal(3, 2)");
+            builder.Property(r => r.ReviewText).HasMaxLength(4096);
+            builder.HasOne(r => r.Movie).WithMany(r => r.Reviews).HasForeignKey(r => r.MovieId);
+            builder.HasOne(r => r.User).WithMany(r => r.Reviews).HasForeignKey(r => r.UserId);
+        }
+
+        private void ConfigureUser(EntityTypeBuilder<User> builder)
+        {
+            builder.ToTable("User");
+            builder.HasKey(u => u.Id);
+            builder.Property(u => u.FirstName).HasMaxLength(128);
+            builder.Property(u => u.LastName).HasMaxLength(128);
+            builder.Property(u => u.DateOfBirth).HasDefaultValueSql("getdate()");
+            builder.Property(u => u.Email).HasMaxLength(256);
+            builder.Property(u => u.HashedPassword).HasMaxLength(1024);
+            builder.Property(u => u.Salt).HasMaxLength(1024);
+            builder.Property(u => u.PhoneNumber).HasMaxLength(16);
+            builder.Property(u => u.TwoFactorEnabled);
+            builder.Property(u => u.LockoutEndDate).HasDefaultValueSql("getdate()");
+            builder.Property(u => u.LastLoginDateTime).HasDefaultValueSql("getdate()");
+            builder.Property(u => u.IsLocked);
+            builder.Property(u => u.AccessFailedCount);
+        }
+
+        private void ConfigureMovieCrew(EntityTypeBuilder<MovieCrew> builder)
+        {
+            builder.ToTable("MovieCrew");
+            builder.HasKey(mcr => new { mcr.CrewId, mcr.MovieId, mcr.Department, mcr.Job });
+            builder.HasOne(mcr => mcr.Movie).WithMany(mcr => mcr.MovieCrews).HasForeignKey(mcr => mcr.MovieId);
+            builder.HasOne(mcr => mcr.Crew).WithMany(mcr => mcr.MovieCrews).HasForeignKey(mc => mc.CrewId);
+        }
+
+        private void ConfigureCrew(EntityTypeBuilder<Crew> builder)
+        {
+            builder.ToTable("Crew");
+            builder.HasKey(cr => cr.Id);
+            builder.Property(cr => cr.Name).HasMaxLength(128);
+            builder.Property(cr => cr.Gender).HasMaxLength(4096);
+            builder.Property(cr => cr.TmdbUrl).HasMaxLength(4096);
+            builder.Property(c => c.ProfilePath).HasMaxLength(2084);
+        }
+
         private void ConfigureMovieCast(EntityTypeBuilder<MovieCast> builder)
         {
             builder.ToTable("MovieCast");
