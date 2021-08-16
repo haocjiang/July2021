@@ -140,7 +140,7 @@ namespace Infrastructure.Data
             builder.ToTable("MovieCrew");
             builder.HasKey(mcr => new { mcr.CrewId, mcr.MovieId, mcr.Department, mcr.Job });
             builder.HasOne(mcr => mcr.Movie).WithMany(mcr => mcr.MovieCrews).HasForeignKey(mcr => mcr.MovieId);
-            builder.HasOne(mcr => mcr.Crew).WithMany(mcr => mcr.MovieCrews).HasForeignKey(mc => mc.CrewId);
+            builder.HasOne(mcr => mcr.Crew).WithMany(mcr => mcr.MovieCrews).HasForeignKey(mcr => mcr.CrewId);
         }
 
         private void ConfigureCrew(EntityTypeBuilder<Crew> builder)

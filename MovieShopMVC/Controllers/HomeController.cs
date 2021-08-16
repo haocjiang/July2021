@@ -4,6 +4,7 @@ using System.Diagnostics;
 using Infrastructure.Services;
 using System.Linq;
 using ApplicationCore.ServiceInterfaces;
+using System.Threading.Tasks;
 
 namespace MovieShopMVC.Controllers
 {
@@ -16,20 +17,21 @@ namespace MovieShopMVC.Controllers
             _movieService = movieService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             //get top revenue movie and display on the view
-            var movies = _movieService.GetTopRevenueMovies();
+            var movieCards = await _movieService.GetTopRevenueMovies();
+            return View(movieCards);
             //3 ways to pass data from controller to view
             //1.Strong typed models
             //2.View Bag
             //3.View Data
             //C#
 
-            ViewBag.PageTitle = "Top Revenue Movies";
-            ViewData["TotalMovies"] = movies.Count();
+            //ViewBag.PageTitle = "Top Revenue Movies";
+            //ViewData["TotalMovies"] = movies.Count();
 
-            return View(movies);
+
         }
 
         //Clean Architecture
