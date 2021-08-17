@@ -34,6 +34,9 @@ namespace MovieShopMVC
             services.AddScoped<IMovieRepository, MovieRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ICastRepository, CastRepository>();
+            services.AddScoped<ICastService, CastService>();
+            services.AddScoped<IGenreService, GenreService>();
 
             services.AddDbContext<MovieShopDbContext>
                 (

@@ -24,7 +24,14 @@ namespace Infrastructure.Services
             {
                 Id = movie.Id,
                 Title = movie.Title,
-                Rating = movie.Rating
+                Rating = movie.Rating,
+                Budget = movie.Budget,
+                ReleaseDate = movie.ReleaseDate,
+                RunTime = movie.RunTime,
+                Revenue = movie.Revenue,
+                Price = movie.Price,
+                Overview = movie.Overview,
+                Tagline = movie.Tagline
             };
             movieDetailsModel.Casts = new List<CastResponseModel>();
             foreach (var cast in movie.MovieCasts)
