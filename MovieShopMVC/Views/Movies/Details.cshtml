@@ -15,11 +15,11 @@
                     <h1 class="text-white">
                         @Model.Title
                     </h1>
-                    <small class="text-muted">@Model.Tagline</small>
+                    <span style="color:white">@Model.Tagline</span>
                 </div>
             </div>
             <div class="row">
-                <div class="col-4 text-secondary font-weight-bold mt-2">
+                <div class="col-4 text-white font-weight-bold mt-2 text-white">
                     @Model.RunTime m | @Model.ReleaseDate.Value.Date.Year
                 </div>
                 <div class="col-8">
@@ -38,6 +38,44 @@
                     </h4>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-12 text-light mt-2">
+                    @Model.Overview
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 mt-4 offset-1">
+            <button type="button" class="btn btn-outline-light btn-block">REVIEW</button><br />
+            <button type="button" class="btn btn-outline-light btn-block">TRAILER</button><br />
+            <button type="button" class="btn btn-light btn-block">BUY @Model.Price</button><br />
+            <button type="button" class="btn btn-light btn-block">WATCH MOVIE</button>
+        </div>
+    </div>
+</div>
 
+<div class="row mt-4">
+    <div class="col-4">
+        <h5>MOVIE FACTS</h5>
+        <hr>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">Release Date <span class="badge badge-dark">@Model.ReleaseDate.Value.ToString("MM/dd/yyyy")</span></li>
+            <li class="list-group-item">Run Time <span class="badge badge-dark">@Model.RunTime m</span></li>
+            <li class="list-group-item">Box Office <span class="badge badge-dark">$ @Model.Revenue.Value.ToString("C0")</span></li>
+            <li class="list-group-item">Budget <span class="badge badge-dark">$ @Model.Budget.Value.ToString("C0")</span></li>
+        </ul>
+    </div>
+
+    <div class="col-6 offset-1">
+        <h5>CAST</h5>
+        <div class="card border-0">
+            @foreach (var cast in Model?.Casts)
+            {
+                <ul class="list-group list-group-horizontal">
+                    <li class="list-group-item col-1 border-left-0"><a asp-controller="Cast" asp-action="Details" asp-route-id="@cast.Id"><img src="@cast.ProfilePath" class="img-fluid" alt="@cast.Name" /></a></li>
+                    <li class="list-group-item col-4 border-left-0">@cast.Name</li>
+                    <li class="list-group-item col-7 border-left-0 border-right-0">@cast.Character</li>
+                </ul>
+            }
+        </div>
     </div>
 </div>

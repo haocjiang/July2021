@@ -19,14 +19,30 @@ namespace Infrastructure.Services
         }
 
 
-        public async Task<CastDetailsResponseModel> GetCastDetails(int id)
+        public async Task<CastResponseModel> GetCastDetails(int id)
         {
             var cast = await _castRepository.GetByIdAsync(id);
-            if (cast == null)
+            var castDetailsModel = new CastResponseModel
             {
-                throw new Exception("Cast Not Found");
+                Id = cast.Id,
+                Name = cast.Name,
+                Gender = cast.Gender,
+                ProfilePath = cast.ProfilePath
+            };
+
+            castDetailsModel.Movies = new List<MovieDetailsResponseModel>();
+
+            foreach (var movie in cast.MovieCasts)
+            {
+                castDetailsModel.Movies.Add(new MovieDetailsResponseModel
+                {
+                    Id = movie.MovieId,
+                    Title = movie.Movie.Title,
+                    PosterUrl = movie.Movie.PosterUrl,
+                    ReleaseDate = movie.Movie.ReleaseDate.Value
+                });
             }
-            return null;
+            return castDetailsModel;
         }
     }
 }

@@ -31,12 +31,18 @@ namespace Infrastructure.Services
                 Revenue = movie.Revenue,
                 Price = movie.Price,
                 Overview = movie.Overview,
-                Tagline = movie.Tagline
+                Tagline = movie.Tagline,
+                ImdbUrl = movie.ImdbUrl,
+                TmdbUrl =movie.TmdbUrl,
+                PosterUrl = movie.PosterUrl,
+                BackdropUrl = movie.BackdropUrl,
+                OriginalLanguage = movie.OriginalLanguage,
+
             };
             movieDetailsModel.Casts = new List<CastResponseModel>();
             foreach (var cast in movie.MovieCasts)
             {
-                movieDetailsModel.Casts.Add(new CastResponseModel { Id = cast.CastId, Name = cast.Cast.Name, Character = cast.Character });
+                movieDetailsModel.Casts.Add(new CastResponseModel { Id = cast.CastId, Name = cast.Cast.Name, Character = cast.Character, Gender = cast.Cast.Gender, ProfilePath = cast.Cast.ProfilePath});
             }
 
             movieDetailsModel.Genres = new List<GenreResponseModel>();
