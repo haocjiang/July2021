@@ -157,3 +157,4 @@ C:\Users\andre\source\repos\JulyBatch\MovieShop\MovieShopMVC\obj\Debug\net5.0\Ra
 C:\Users\andre\source\repos\JulyBatch\MovieShop\MovieShopMVC\obj\Debug\net5.0\Razor\Views\Cast\Details.cshtml.g.cs
 C:\Users\andre\source\repos\JulyBatch\MovieShop\MovieShopMVC\obj\Debug\net5.0\Razor\Views\User\GetAllPurchases.cshtml.g.cs
 C:\Users\andre\source\repos\JulyBatch\MovieShop\MovieShopMVC\obj\Debug\net5.0\Razor\Views\User\GetFavorites.cshtml.g.cs
+C:\Users\andre\source\repos\JulyBatch\MovieShop\MovieShopMVC\obj\Debug\net5.0\Razor\Views\Genres\Index.cshtml.g.cs

@@ -19,6 +19,7 @@ namespace MovieShopMVC.Controllers
 
         public async Task<IActionResult> Index()
         {
+           
             //get top revenue movie and display on the view
             var movieCards = await _movieService.GetTopRevenueMovies();
             return View(movieCards);
