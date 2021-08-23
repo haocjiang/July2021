@@ -17,34 +17,7 @@ namespace Infrastructure.Data
 
         }
 
-//Code First Approach
-//Install the required packages
-
-//Creating the database using EF core code first approach, we use something called Migrations(set of commands that we run to create the database)
-	
-//2 ways we can implement migrations
-//	1.Universal Way => everyone Windows/Mac/Linux => dotnet cli
-//	2.Windows and Visual Studio => Package Manager Console => here we can run our Migration commands
-//	Create a connection string in your startup(MVC) project
-
-//2 most important classes
-
-//1. DbContext => Represents your Database
-//2. DbSet => Your Tables
-
-// Create a class that inherites from DbContext
-// DbSets represents your tables
-// Create the DbSets Properties inside DBContext
-// Inject the ConnectionString from the Startup file (read the connection string from appsetting.json) to DbContext using DbContextOptions
-// Migrations, run migrations against the DbContext Class which is located in Infrastructure
-// COmmands that we are gonna tell Entity Framework to read our DbCOntext, DbSets, enttiies ,properties..
-// Make sure Migrations are named in a meaningful way, think of them as SQL Scripts
-// Add your very first migration usig Add-Migration InitialCreate 
-// ALways check the created Migration FIle, to make sure it has things you are expecting. It has 2 methods Up() and Down()
-
-   // Using Data Annotations, attributes you use on your Entities
-   // Fluent API (more flecivle and has more options in advanced scenarios)
-		public DbSet<Genre> Genres { get; set; }
+        public DbSet<Genre> Genres { get; set; }
         public DbSet<Movie> Movies { get; set; }
         public DbSet<Trailer> Trailers { get; set; }
         public DbSet<Cast> Casts { get; set; }

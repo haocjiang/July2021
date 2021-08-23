@@ -34,5 +34,11 @@ namespace Infrastructure.Repositories
             var user = await _dbContext.Users.Include(u => u.Purchases).ThenInclude(u => u.Movie).FirstOrDefaultAsync(u => u.Id == id);
             return user;
         }
+
+        public async Task<User> GetReviewsById(int id)
+        {
+            var user = await _dbContext.Users.Include(u => u.Reviews).FirstOrDefaultAsync(u => u.Id == id);
+            return user;
+        }
     }
 }

@@ -12,5 +12,6 @@ namespace ApplicationCore.RepositoryInterfaces
         Task<User> GetUserByEmail(string email);
         Task<User> GetUserPurchaseById(int id);
         Task<User> GetUserFavoriteById(int id);
+        Task<User> GetReviewsById(int id);
     }
 }

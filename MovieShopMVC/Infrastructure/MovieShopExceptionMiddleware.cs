@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Serilog;
+using Serilog.Sinks.File;
 
 namespace MovieShopMVC.Infrastructure
 {
@@ -38,9 +40,6 @@ namespace MovieShopMVC.Infrastructure
 
                 await HandleException(httpContext, ex);
             }
-
-          
-           
         }
 
         private async Task HandleException( HttpContext httpContext, Exception ex)
@@ -73,6 +72,10 @@ namespace MovieShopMVC.Infrastructure
             // Send email using MailKit to Dev Team
             httpContext.Response.Redirect("/Home/Error");
 
+            var log = new LoggerConfiguration()
+                            .WriteTo.File("log.txt", outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
+                            rollingInterval: RollingInterval.Hour).CreateLogger();
+            log.Information($"{ex}");
             await Task.CompletedTask;
         }
     }

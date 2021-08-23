@@ -17,10 +17,20 @@ namespace MovieShopMVC.Controllers
 
         public async Task<IActionResult> Index()
         {
-            // Show List of Genres in the Header of LayoutPage Hint: Use Partial View and use Bootstarp DropDown to show genres 
-            // Use <a> with name og genre and that when clicked go to database and show list of movies belong to that genre
             var genres = await _genreService.GetAllGenres();
             return View(genres);
+        }
+        public async Task<IActionResult> Details(int id)
+        {
+            var genre = await _genreService.GetGenreById(id);
+            ViewData["genreName"] = genre.Name;
+            var movieCards = await _genreService.GetAllMovies(id);
+            return View(movieCards);
+        }
+        public PartialViewResult ShowInNavBar()
+        {
+            var genres = _genreService.GetAllGenres();
+            return PartialView("~/Views/Shared/_Layout.cshtml", genres);
         }
     }
 }

@@ -336,9 +336,8 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("DateOfBirth")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()");
+                        .HasMaxLength(7)
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -356,18 +355,16 @@ namespace Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<DateTime?>("LastLoginDateTime")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()");
+                        .HasMaxLength(7)
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("LastName")
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
 
                     b.Property<DateTime?>("LockoutEndDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()");
+                        .HasMaxLength(7)
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("PhoneNumber")
                         .HasMaxLength(16)

@@ -40,6 +40,7 @@ namespace MovieShopMVC
             services.AddScoped<ICastRepository, CastRepository>();
             services.AddScoped<ICastService, CastService>();
             services.AddScoped<IAsyncRepository<Genre>, EfRepository<Genre>>();
+            services.AddScoped<IGenreRepository, GenreRepository>();
             services.AddScoped<IGenreService, GenreService>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddMemoryCache();

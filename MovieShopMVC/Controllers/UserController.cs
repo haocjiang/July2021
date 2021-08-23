@@ -31,7 +31,7 @@ namespace MovieShopMVC.Controllers
             // Filters
             var movieCards = await _userService.GetPurchasedMovies(userId);
             // call userservice GetAll Purchases
-            return View();
+            return View(movieCards);
         }
 
         [Authorize]

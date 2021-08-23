@@ -1,41 +1,19 @@
-﻿@model IEnumerable<ApplicationCore.Models.GenreResponseModel>
+﻿@model List<ApplicationCore.Models.GenreResponseModel>
 
-@{
-    ViewData["Title"] = "Index";
-}
+<div class="row justify-content-center bg-dark" style="color:white;">
+    <div class="col-1">
+        <h1>Genres</h1>
+    </div>
+</div>
 
-<h1>Index</h1>
+<div class="row justify-content-center bg-light">
+    <div class="col-4">
+        <ul class="list-group">
+            @foreach (var genre in Model)
+            {
+            <li class="list-group-item"><a asp-controller="Genres" asp-action="Details" asp-route-id="@genre.Id" class="btn btn-primary btn-block">@genre.Name</a></li>
+            }
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Id)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+        </ul>
+    </div>
+</div>

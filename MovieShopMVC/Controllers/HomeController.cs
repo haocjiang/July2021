@@ -19,43 +19,10 @@ namespace MovieShopMVC.Controllers
 
         public async Task<IActionResult> Index()
         {
-           
             //get top revenue movie and display on the view
             var movieCards = await _movieService.GetTopRevenueMovies();
             return View(movieCards);
-            //3 ways to pass data from controller to view
-            //1.Strong typed models
-            //2.View Bag
-            //3.View Data
-            //C#
-
-            //ViewBag.PageTitle = "Top Revenue Movies";
-            //ViewData["TotalMovies"] = movies.Count();
-
-
         }
-
-        //Clean Architecture
-
-        //Interfaces
-
-        //IMovieService
-        //class MovieService: IMovieSerivce, IGenreService
-        //{
-        //}
-
-        //Dependency Injection
-        //Application core layer
-        //Entities => C# classes that represent your domain/databse object =>
-        //Models => 
-
-        // 15 tables
-        //20 columns in the movie table
-        //Entity => Movie 20 properties
-
-        //Models => UI
-        //Movie list => MovieCardModel => id, title, posterimage
-        //DTO (Data Transfer Objects) => API
 
         public IActionResult Privacy()
         {
