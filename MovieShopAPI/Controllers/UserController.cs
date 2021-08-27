@@ -1,5 +1,6 @@
 ﻿using ApplicationCore.Models;
 using ApplicationCore.ServiceInterfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -14,121 +15,134 @@ namespace MovieShopAPI.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IReviewService _reviewService;
 
-        public UserController(IUserService userService, IReviewService reviewService)
+        public UserController(IUserService userService)
         {
             _userService = userService;
-            _reviewService = reviewService;
         }
 
         [HttpPost]
         [Route("purchase")]
-        public async Task<IActionResult> PurchasesMovie([FromBody] PurchaseMovieModel purchaseMovie)
+        public async Task<IActionResult> PurchasesMovie([FromBody] PurchaseRequestModel model)
         {
-            var movie = await _userService.PurchaseMovie(purchaseMovie);
+            var purchase = await _userService.PurchaseMovie(model);
 
-            if (movie == null)
+            if (purchase == null)
             {
                 return NotFound("Purchase movie filed");
             }
-            return Ok(movie);
+            return Ok(purchase);
         }
-
 
         [HttpPost]
         [Route("favorite")]
-        public async Task<IActionResult> Favorite([FromBody] FavoriteRequestModel model)
+        public async Task<IActionResult> FavoriteMovie([FromBody] FavoriteRequestModel model)
         {
-            var favoriteMovieResponse = await _userService.AddToFavorite(model);
-            return Ok(favoriteMovieResponse);
+            var favorite = await _userService.FavoriteMovie(model);
+            if (favorite == null)
+            {
+                return BadRequest("Favorite Failed");
+            }
+            return Ok(favorite);
         }
 
         [HttpPost]
         [Route("unfavorite")]
-        public async Task<IActionResult> UnFavorite([FromBody] UnFavoriteRequestModel model)
+        public async Task<IActionResult> UnfavoriteMovie([FromBody] UnFavoriteResponseModel model)
         {
-            var unfavoriteMovieResponse = await _userService.removefromFavorite(model);
-            return Ok(unfavoriteMovieResponse);
+            var unfavorite = await _userService.UnfavoriteMovie(model);
+            if (unfavorite == null)
+            {
+                return BadRequest("Unfavorite Failed");
+            }
+            return Ok(unfavorite);
         }
 
         [HttpGet]
         [Route("{id:int}/movie/{movieId:int}/favorite")]
-        public async Task<IActionResult> GetFavoriteMovie(int id, int movieId)
+        public async Task<IActionResult> GetFavoriteMovieDetails(int id, int movieId)
         {
-            var userPurchases = await _userService.GetFavoriteMovieDetail(id, movieId);
-            if (userPurchases == null)
+            var movieDetails = await _userService.GetFavoriteMovieDetails(id, movieId);
+            if (movieDetails == null)
             {
-                return NotFound("No movie Found");
+                return NotFound("No Movie Details Found");
             }
-            return Ok(userPurchases);
+            return Ok(movieDetails);
         }
 
         [HttpPost]
         [Route("review")]
-        public async Task<IActionResult> PostReview([FromBody] ReviewsRequestModel model)
+        public async Task<IActionResult> WriteReview([FromBody] ReviewsRequestModel model)
         {
-            var createdReviews = await _userService.PostReviews(model);
-            return Ok(createdReviews);
+            var review = await _userService.WriteReview(model);
+            if (review == null)
+            {
+                return BadRequest("Write Review Failed");
+            }
+            return Ok(review);
         }
 
         [HttpPut]
         [Route("review")]
-        public async Task<IActionResult> PutReviews([FromBody] ReviewsRequestModel model)
+        public async Task<IActionResult> UpdateReview([FromBody] ReviewsRequestModel model)
         {
-
-            var createdReviews = await _userService.PutReviews(model);
-            return Ok(createdReviews);
+            var review = await _userService.UpdateReview(model);
+            if (review == null)
+            {
+                return BadRequest("Update Review Failed");
+            }
+            return Ok(review);
         }
 
         [HttpDelete]
-        [Route("{id:int}/movie/{movieId:int}")]
-        public async Task<IActionResult> DeleteReviews(int id, int movieId)
+        [Route("{userId:int}/movie/{movieId:int}")]
+        public async Task<IActionResult> DeleteReview(int userId, int movieId)
         {
-
-            var status = await _userService.DeleteReviews(id, movieId);
-            return Ok(status);
+            var review = await _userService.DeleteReview(userId, movieId);
+            if (review == null)
+            {
+                return BadRequest("Delete Review Failed");
+            }
+            return Ok(review);
         }
 
+        [Authorize]
         [HttpGet]
         [Route("{id:int}/purchases")]
-        public async Task<IActionResult> GetUserPurchases(int id)
+        public async Task<IActionResult> GetAllPurchases(int id)
         {
-            var userPurchases = await _userService.GetPurchaseById(id);
-
-            if (!userPurchases.Any())
+            var movies = await _userService.GetPurchasedMovies(id);
+            if (movies == null)
             {
-                return NotFound("No movie Found");
+                return NotFound("No Movie Found");
             }
-            return Ok(userPurchases);
+            return Ok(movies);
         }
 
         [HttpGet]
         [Route("{id:int}/favorites")]
         public async Task<IActionResult> GetUserfavorites(int id)
         {
-            var userFavorites = await _userService.GetFavoriteById(id);
-
-            if (!userFavorites.Any())
+            var movies = await _userService.GetFavoriteMovies(id);
+            if (movies == null)
             {
-                return NotFound("No user Found");
+                return NotFound("No Movie Found");
             }
-            return Ok(userFavorites);
+            return Ok(movies);
         }
 
         [HttpGet]
         [Route("{id:int}/reviews")]
         public async Task<IActionResult> GetUserReview(int id)
         {
-            var userReviews = await _userService.GetReviews(id);
-
-            if (!userReviews.Any())
+            var reviews = await _userService.GetReviews(id);
+            if (reviews == null)
             {
-                return NotFound("No user Found");
+                return NotFound("No Review Found");
             }
-            return Ok(userReviews);
+            return Ok(reviews);
         }
 
-
+       
     }
 }

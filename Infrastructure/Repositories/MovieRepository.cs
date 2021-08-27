@@ -44,43 +44,35 @@ namespace Infrastructure.Repositories
             return movie;
         }
 
-        public async Task<List<Movie>> GetMoviesByGenre(int id)
-        {
-
-            var movies = await _dbContext.Movies.Include(m => m.Genres).ToListAsync();
-            return movies;
-        }
-
         public async Task<IEnumerable<Movie>> GetTopRatedMovies()
         {
-            var topRatedMovies = await _dbContext.Reviews.Include(m => m.Movie)
+            var topRatedMovies = await _dbContext.Reviews.Include(r => r.Movie)
                     .GroupBy(r => new
                     {
                         Id = r.MovieId,
                         r.Movie.PosterUrl,
                         r.Movie.Title,
-                        r.Movie.ReleaseDate
                     })
-                    .OrderByDescending(g => g.Average(m => m.Rating))
+                    .OrderByDescending(g => g.Average(r => r.Rating))
                     .Select(m => new Movie
                     {
                         Id = m.Key.Id,
                         PosterUrl = m.Key.PosterUrl,
                         Title = m.Key.Title,
-                        ReleaseDate = m.Key.ReleaseDate,
                         Rating = m.Average(x => x.Rating)
                     })
-                    .Take(50)
+                    .Take(30)
                     .ToListAsync();
 
             return topRatedMovies;
         }
 
-        public async Task<Movie> GetMovieReviews(int id)
+        public async Task<IEnumerable<Review>> GetReviewsByMovieId(int id)
         {
-            var movie = await _dbContext.Movies.Include(m => m.Reviews).FirstOrDefaultAsync(m => m.Id == id);
+            var movie = await _dbContext.Reviews.Where(r => r.MovieId == id).ToListAsync();
 
             return movie;
         }
+
     }
 }

@@ -35,10 +35,5 @@ namespace Infrastructure.Repositories
             return user;
         }
 
-        public async Task<User> GetReviewsById(int id)
-        {
-            var user = await _dbContext.Users.Include(u => u.Reviews).FirstOrDefaultAsync(u => u.Id == id);
-            return user;
-        }
     }
 }

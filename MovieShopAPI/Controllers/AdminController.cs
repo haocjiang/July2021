@@ -13,26 +13,42 @@ namespace MovieShopAPI.Controllers
     [ApiController]
     public class AdminController : ControllerBase
     {
-        private readonly IMovieService _movieService;
-        public AdminController(IMovieService movieService)
+        private readonly IAdminService _adminService;
+        public AdminController(IAdminService adminService)
         {
-            _movieService = movieService;
+            _adminService = adminService;
         }
 
         [HttpPost]
         [Route("movie")]
-        public async Task<IActionResult> CreateMovie([FromBody] MovieCreateRequestModel movie)
+        public async Task<IActionResult> CreateMovie([FromBody] MovieCreateRequestModel model)
         {
-            var newMovie = await _movieService.CreateMovie(movie);
-            return Ok(newMovie);
+            var movie = await _adminService.CreateMovie(model);
+            return Ok(movie);
         }
 
         [HttpPut]
         [Route("movie")]
-        public async Task<IActionResult> UpdateMovie([FromBody] MovieUpdateRequestModel movie)
+        public async Task<IActionResult> UpdateMovie([FromBody] MovieCreateRequestModel model)
         {
-            var updatedMovie = await _movieService.UpdateMovie(movie);
-            return Ok(updatedMovie);
+            var movie = await _adminService.UpdateMovie(model);
+            if (movie == null)
+            {
+                return BadRequest($"No Movie Found For Id = {model.Id}");
+            }
+            return Ok(movie);
+        }
+
+        [HttpGet]
+        [Route("purchases")]
+        public async Task<IActionResult> GetAllPurchases()
+        {
+            var purchases = await _adminService.GetAllPurchases();
+            if (purchases == null)
+            {
+                return NotFound("No Purchase Found");
+            }
+            return Ok(purchases);
         }
     }
 }

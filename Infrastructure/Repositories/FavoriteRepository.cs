@@ -17,10 +17,10 @@ namespace Infrastructure.Repositories
 
         }
 
-        public async Task<Favorite> GetFavorite(int UserId, int movieId)
+        public async Task<Favorite> GetFavoriteMovieDetails(int userId, int movieId)
         {
 
-            var movie = await _dbContext.Favorites.Include(f => f.Movie).FirstOrDefaultAsync(f => f.UserId == UserId && f.MovieId == movieId);
+            var movie = await _dbContext.Favorites.Include(f => f.Movie).Where(f => f.MovieId == movieId && f.UserId == userId).FirstOrDefaultAsync();
             return movie;
         }
     }

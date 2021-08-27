@@ -20,13 +20,13 @@ namespace MovieShopAPI.Controllers
 
         [HttpGet]
         [Route("{id:int}")]
-        public async Task<IActionResult> GetCast(int id)
+        public async Task<IActionResult> GetCastDetailsById(int id)
         {
-            var cast = await _castService.GetCastById(id);
+            var cast = await _castService.GetCastDetails (id);
 
             if (cast == null)
             {
-                return NotFound($"No cast Found for that {id}");
+                return NotFound($"No cast Found for Id = {id}");
             }
             return Ok(cast);
         }

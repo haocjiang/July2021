@@ -28,6 +28,40 @@ namespace Infrastructure.Services
             _reviewRepository = reviewRepository;
         }
 
+        public async Task<FavoriteResponseModel> FavoriteMovie(FavoriteRequestModel model)
+        {
+            var exist = await _favoriteRepository.GetExistsAsync(f => f.MovieId == model.MovieId && f.UserId == model.UserId);
+            if (exist)
+            {
+                throw new Exception("This user has already favorite this movie");
+            }
+            var favorite = new Favorite { MovieId = model.MovieId, UserId = model.UserId };
+            var createdFavorite = await _favoriteRepository.AddAsync(favorite);
+            var favoriteResponse = new FavoriteResponseModel { Id = createdFavorite.Id, MovieId = createdFavorite.MovieId, UserId = createdFavorite.UserId };
+            return favoriteResponse;
+        }
+
+        public async Task<MovieDetailsResponseModel> GetFavoriteMovieDetails(int userId, int movieId)
+        {
+            var favorite = await _favoriteRepository.GetFavoriteMovieDetails(userId, movieId);
+            if (favorite == null)
+            {
+                throw new Exception("This user did not favorite this movie");
+            }
+            var movieDetails = new MovieDetailsResponseModel
+            {
+                Id = favorite.Movie.Id,
+                Title = favorite.Movie.Title,
+                Overview = favorite.Movie.Overview,
+                Budget = favorite.Movie.Budget,
+                Revenue = favorite.Movie.Revenue,
+                PosterUrl = favorite.Movie.PosterUrl,
+                ReleaseDate = favorite.Movie.ReleaseDate,
+                RunTime = favorite.Movie.RunTime
+            };
+            return movieDetails;
+        }
+
         public async Task<IEnumerable<MovieCardResponseModel>> GetFavoriteMovies(int userId)
         {
             var user = await _userRepository.GetUserFavoriteById(userId);
@@ -75,25 +109,8 @@ namespace Infrastructure.Services
             return userResponseModel;
         }
 
-        public async Task<IEnumerable<UserResponseModel>> GetAllUsers()
-        {
-            var users = await _userRepository.ListAllAsync();
-            var userList = new List<UserResponseModel>();
-            foreach (var user in users)
-            {
-                userList.Add(new UserResponseModel
-                {
-                    Id = user.Id,
-                    Email = user.Email,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    DateOfBirth = user.DateOfBirth
-                });
-            }
-            return userList;
-        }
 
-        public async Task<PurchaseMovieResponseModel> PurchaseMovie(PurchaseMovieModel purchaseMovie)
+        public async Task<PurchaseResponseModel> PurchaseMovie(PurchaseRequestModel purchaseMovie)
         {
             var dbPurchase = await _purchaseRepository.GetExistsAsync(p => p.MovieId == purchaseMovie.MovieId && p.UserId == purchaseMovie.UserId);
 
@@ -107,7 +124,7 @@ namespace Infrastructure.Services
                 MovieId = purchaseMovie.MovieId
 
             });
-            var purchase = new PurchaseMovieResponseModel()
+            var purchase = new PurchaseResponseModel()
             {
                 MovieId = purchaseMovie.MovieId,
                 UserId = purchaseMovie.MovieId,
@@ -115,95 +132,10 @@ namespace Infrastructure.Services
             return purchase;
         }
 
-        public async Task<List<UserPurchaseModel>> GetPurchaseById(int id)
-        {
-            var user = await _userRepository.GetUserPurchaseById(id);
-
-            var UserPurchaseMovies = new List<UserPurchaseModel>();
-
-            foreach (var u in user.Purchases)
-            {
-                UserPurchaseMovies.Add(new UserPurchaseModel
-                {
-                    PurchaseId = u.Id,
-                    UserId = u.UserId,
-                    MovieId = u.MovieId,
-                });
-            }
-            return UserPurchaseMovies;
-        }
-
-        public async Task<FavoriteResponseModel> AddToFavorite(FavoriteRequestModel model)
-        {
-            var dbFavorite = await _favoriteRepository.GetExistsAsync(f => f.MovieId == model.MovieId && f.UserId == model.UserId);
-            if (dbFavorite == true)
-            {
-                throw new ConflictException("The movie arleady added!");
-            }
-
-            await _favoriteRepository.AddAsync(new Favorite
-            {
-                UserId = model.UserId,
-                MovieId = model.MovieId
-            });
-
-            var addFavoriteResonse = new FavoriteResponseModel
-            {
-                UserId = model.UserId,
-                MovieId = model.MovieId
-            };
-
-            return addFavoriteResonse;
-        }
-
-        public async Task<UnFavoriteResponseModel> removefromFavorite(UnFavoriteRequestModel model)
-        {
-            var dbFavorite = await _favoriteRepository.GetExistsAsync(f => f.Id == model.Id);
-
-            if (dbFavorite != true)
-            {
-                throw new ConflictException("The movie dose not exists!");
-            }
-
-            await _favoriteRepository.DeleteAsync(new Favorite
-            {
-                Id = model.Id,
-                UserId = model.UserId,
-                MovieId = model.MovieId
-            });
-
-            var deleteFavoriteResonse = new UnFavoriteResponseModel
-            {
-                Id = model.Id,
-                UserId = model.UserId,
-                MovieId = model.MovieId
-            };
-
-            return deleteFavoriteResonse;
-        }
-
-        public async Task<List<UserFavoriteMoviesModel>> GetFavoriteById(int id)
-        {
-            var user = await _userRepository.GetUserFavoriteById(id);
-
-            var UserFavoriteMovies = new List<UserFavoriteMoviesModel>();
-
-            foreach (var m in user.Favorites)
-            {
-                UserFavoriteMovies.Add(new UserFavoriteMoviesModel
-                {
-                    Id = m.Id,
-                    UserId = m.UserId,
-                    MoiveName = m.Movie.Title,
-                    MovieId = m.MovieId
-                });
-            }
-            return UserFavoriteMovies;
-        }
 
         public async Task<MovieCardResponseModel> GetFavoriteMovieDetail(int id, int movieId)
         {
-            var dbFavorite = await _favoriteRepository.GetFavorite(id, movieId);
+            var dbFavorite = await _favoriteRepository.GetFavoriteMovieDetails(id, movieId);
             var movieCardResponseModel = new MovieCardResponseModel
             {
                 Id = dbFavorite.Id,
@@ -215,97 +147,11 @@ namespace Infrastructure.Services
             return movieCardResponseModel;
         }
 
-        public async Task<List<MovieReviewsModel>> GetReviews(int id)
+        public async Task<IEnumerable<Review>> GetReviews(int userId)
         {
-            var user = await _userRepository.GetReviewsById(id);
-            var movieReview = new List<MovieReviewsModel>();
-
-            foreach (var m in user.Reviews)
-            {
-                movieReview.Add(new MovieReviewsModel
-                {
-                    Rating = m.Rating,
-                    ReviewText = m.ReviewText,
-                    MovieId = m.MovieId,
-                    UserId = m.UserId
-                });
-            }
-            return movieReview;
+            return await _reviewRepository.GetReviewsByUserId(userId);
         }
 
-        public async Task<ReviewsResponseModel> PostReviews(ReviewsRequestModel model)
-        {
-            var dbReviews = await _reviewRepository.GetExistsAsync(f => f.MovieId == model.MovieId && f.UserId == model.UserId);
-
-            if (dbReviews != false)
-            {
-                throw new ConflictException("You already posted a review for this movie");
-            }
-            await _reviewRepository.AddAsync(new Review
-            {
-                MovieId = model.MovieId,
-                UserId = model.UserId,
-                Rating = model.Rating,
-                ReviewText = model.ReviewText
-            });
-
-            var postReviewsResponse = new ReviewsResponseModel
-            {
-                MovieId = model.MovieId,
-                UserId = model.UserId,
-                Rating = model.Rating,
-                ReviewText = model.ReviewText
-
-            };
-
-            return postReviewsResponse;
-        }
-
-        public async Task<ReviewsResponseModel> PutReviews(ReviewsRequestModel model)
-        {
-            var dbReviews = await _reviewRepository.GetExistsAsync(f => f.MovieId == model.MovieId && f.UserId == model.UserId);
-
-            if (dbReviews != true)
-            {
-                throw new ConflictException("Conflict");
-            }
-            await _reviewRepository.UpdateAsync(new Review
-            {
-                MovieId = model.MovieId,
-                UserId = model.UserId,
-                Rating = model.Rating,
-                ReviewText = model.ReviewText
-            });
-
-            var postReviewsResponse = new ReviewsResponseModel
-            {
-                MovieId = model.MovieId,
-                UserId = model.UserId,
-                Rating = model.Rating,
-                ReviewText = model.ReviewText
-
-            };
-
-            return postReviewsResponse;
-        }
-
-        public async Task<string> DeleteReviews(int id, int movieId)
-        {
-            var dbreview = await _reviewRepository.GetExistsAsync(r => r.UserId == id && r.MovieId == movieId);
-
-            if (dbreview != true)
-            {
-                throw new ConflictException("Conflict");
-            }
-
-            await _reviewRepository.DeleteAsync(new Review
-            {
-                MovieId = movieId,
-                UserId = id
-            });
-            return "The reviews is Deleted";
-
-        }
 
         public async Task<UserLoginResponseModel> Login(LoginRequestModel model)
         {
@@ -398,6 +244,77 @@ namespace Infrastructure.Services
                                                                      iterationCount: 10000,
                                                                      numBytesRequested: 256 / 8));
             return hashed;
+        }
+
+        public async Task<UnFavoriteResponseModel> UnfavoriteMovie(UnFavoriteResponseModel model)
+        {
+            var exist = await _favoriteRepository.GetExistsAsync(f => f.Id == model.Id);
+            if (!exist)
+            {
+                throw new Exception("This user did not favorite this movie");
+            }
+            var favorite = new Favorite { Id = model.Id, MovieId = model.MovieId, UserId = model.UserId };
+            var unfavorite = await _favoriteRepository.DeleteAsync(favorite);
+            return model;
+        }
+
+        public async Task<ReviewsRequestModel> WriteReview(ReviewsRequestModel model)
+        {
+            var exist = await _reviewRepository.GetExistsAsync(r => r.UserId == model.UserId && r.MovieId == model.MovieId);
+            if (exist)
+            {
+                throw new Exception("This user has already written review for this movie");
+            }
+            var review = new Review
+            {
+                UserId = model.UserId,
+                MovieId = model.MovieId,
+                ReviewText = model.ReviewText,
+                Rating = model.Rating
+            };
+            var createdReview = await _reviewRepository.AddAsync(review);
+            return model;
+        }
+
+        public async Task<ReviewsRequestModel> UpdateReview(ReviewsRequestModel model)
+        {
+            var exist = await _reviewRepository.GetExistsAsync(r => r.UserId == model.UserId && r.MovieId == model.MovieId);
+            if (!exist)
+            {
+                throw new Exception("This user has not written review for this movie");
+            }
+            var review = new Review
+            {
+                UserId = model.UserId,
+                MovieId = model.MovieId,
+                ReviewText = model.ReviewText,
+                Rating = model.Rating
+            };
+            var createdReview = await _reviewRepository.UpdateAsync(review);
+            return model;
+        }
+
+        public async Task<ReviewsRequestModel> DeleteReview(int userId, int movieId)
+        {
+            var exist = await _reviewRepository.GetExistsAsync(r => r.UserId == userId && r.MovieId == movieId);
+            if (!exist)
+            {
+                throw new Exception("This user has not written review for this movie");
+            }
+            var review = new Review
+            {
+                UserId = userId,
+                MovieId = movieId,
+            };
+            var createdReview = await _reviewRepository.DeleteAsync(review);
+            var reviewResponse = new ReviewsRequestModel
+            {
+                UserId = createdReview.UserId,
+                MovieId = createdReview.MovieId,
+                ReviewText = createdReview.ReviewText,
+                Rating = createdReview.Rating
+            };
+            return reviewResponse;
         }
     }
 }
